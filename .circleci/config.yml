@@ -3,7 +3,7 @@ orbs:
   slack: circleci/slack@4.10.1
 
 commands:
-  NotifyFailure:
+  notify_failure:
     steps:
       - slack/notify:
           channel: udacitydev
@@ -58,7 +58,7 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-deps
-      - NotifyFailure
+      - notify_failure
 
   build-backend:
     docker:
@@ -76,7 +76,7 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-deps
-      - NotifyFailure
+      - notify_failure
 
   test-frontend:
     docker:
@@ -91,7 +91,7 @@ jobs:
             cd frontend
             npm install
             npm run test
-      - NotifyFailure
+      - notify_failure
 
   test-backend:
     docker:
@@ -106,7 +106,7 @@ jobs:
             cd backend
             npm install
             npm run test
-      - NotifyFailure
+      - notify_failure
 
   scan-frontend:
     docker:
@@ -122,7 +122,7 @@ jobs:
             npm install
             # npm install oauth-sign@^0.9.0
             npm audit fix --audit-level=critical --force
-      - NotifyFailure
+      - notify_failure
 
   scan-backend:
     docker:
@@ -138,7 +138,7 @@ jobs:
             npm install
             # npm install oauth-sign@^0.9.0
             npm audit fix --audit-level=critical --force
-      - NotifyFailure
+      - notify_failure
 
 #   deploy-infrastructure:
 #     docker:
@@ -305,7 +305,7 @@ jobs:
 #               # your code here
 #             fi
 
-notifySuccess:
+notify_success:
   docker:
     - image: 'cimg/base:stable'
   steps:
@@ -327,7 +327,7 @@ workflows:
           requires: [build-backend]
       - scan-frontend:
           requires: [build-frontend]
-      - notifySuccess:
+      - notify_success:
           requires:
             - test-frontend
             - test-backend
