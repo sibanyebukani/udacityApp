@@ -2,13 +2,13 @@ version: 2.1
 orbs:
   slack: circleci/slack@4.10.1
 
-  commands:
-    NotifyFailure:
-      steps:
-        - slack/notify:
-            channel: udacitydev
-            event: fail
-            template: basic_fail_1
+commands:
+  NotifyFailure:
+    steps:
+      - slack/notify:
+          channel: udacitydev
+          event: fail
+          template: basic_fail_1
 
 #   destroy-environment:
 #     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
@@ -313,7 +313,6 @@ notifySuccess:
         channel: udacitydev
         event: pass
         template: success_tagged_deployment_1
-
 
 workflows:
   default:
