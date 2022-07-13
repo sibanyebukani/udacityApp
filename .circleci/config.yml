@@ -3,31 +3,31 @@ orbs:
   slack: circleci/slack@4.10.1
 
 commands:
-  notify_failure:
-    steps:
-      - slack/notify:
-          channel: udacitydev
-          event: fail
-          template: basic_fail_1
-  install_awscli:
-    description: install AWS cli
-    steps:
-      - run:
-          name: Install AWS cli
-          command: |
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            sudo unzip awscliv2.zip
-            sudo ./aws/install
-  install_ansible:
-    description: install Ansible
-    steps:
-      - run:
-          name: Install Ansible
-          command: |
-            sudo apt update
-            sudo apt install software-properties-common
-            sudo add-apt-repository --yes --update ppa:ansible/ansible
-            sudo apt install ansible
+    notify_failure:
+      steps:
+        - slack/notify:
+            channel: udacitydev
+            event: fail
+            template: basic_fail_1
+    install_awscli:
+      description: install AWS cli v2
+      steps:
+        - run:
+            name: Install AWS cli v2
+            command: |
+              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+              unzip awscliv2.zip
+              sudo ./aws/install
+    install_ansible:
+      description: install Ansible
+      steps:
+        - run:
+            name: Install Ansible
+            command: |
+              sudo apt update
+              sudo apt install software-properties-common
+              sudo add-apt-repository --yes --update ppa:ansible/ansible
+              sudo apt install ansible
 
 #   destroy-environment:
 #     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
