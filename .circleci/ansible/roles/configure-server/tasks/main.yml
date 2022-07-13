@@ -1,36 +1,39 @@
----
-- name: 'update apt'
+- name: Update apt packages.
   become: yes
   apt:
     update_cache: yes
 
-- name: 'upgrade apt packages'
-  become: true
+- name: Upgrade packages
+  become: yes
   apt:
-    upgrade: 'yes'
+    upgrade: "yes"
 
-- name: 'install dependencies.'
-  become: true
+- name: Remove dependencies that are no longer required.
+  become: yes
   apt:
-    name: ['nodejs', 'npm']
+    autoremove: "yes"
+
+- name: Remove dependencies that are no longer required.
+  become: yes
+  apt:
+    autoremove: "yes"
+
+- name: Install dependencies
+  become: yes
+  apt:
+    name: ["nodejs", "npm", "python3", "tar", "gzip", "git"]
     state: latest
     update_cache: yes
 
-- name: 'install n'
+- name: install pm2
   become: yes
-  npm:
-    name: n
-    global: yes
-    production: yes
-
-- name: 'install nodejs 12.20.1'
-  become: yes
-  shell: n 12.20.1
-
-- name: 'install pm2'
-  become: true
   npm:
     name: pm2
     global: yes
     production: yes
     state: present
+
+- name: Create dist directory.
+  file:
+    path: "~/home/ubuntu/backend"
+    state: directory

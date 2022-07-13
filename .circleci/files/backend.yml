@@ -32,7 +32,7 @@ Resources:
       InstanceType: t2.micro
       SecurityGroups:
         - Ref: InstanceSecurityGroup
-      KeyName: moniter
+      KeyName: udapeople2
       ImageId: ami-052efd3df9dad4825
       Tags:
         - Key: Name

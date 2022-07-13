@@ -2,7 +2,7 @@ version: 2.1
 orbs:
   slack: circleci/slack@4.10.1
 commands:
-  notify_failure:
+  notify_on_failure:
     steps:
       - slack/notify:
           channel: udacitydev
@@ -28,11 +28,21 @@ commands:
             sudo add-apt-repository --yes --update ppa:ansible/ansible
             sudo apt install ansible -y
 
+  install_nodejs:
+    description: Install Node.js 13
+    steps:
+      - run:
+          name: Install Node.js 13
+          command: |
+            curl -fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash -
+            sudo apt install -y nodejs
+
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
       Workflow_ID:
         type: string
+        default: ${CIRCLE_WORKFLOW_ID:0:7}
     steps:
       - run:
           name: Destroy environments
@@ -78,7 +88,7 @@ jobs:
       - save_cache:
           paths: [frontend/node_modules]
           key: frontend-build
-      - notify_failure
+      - notify_on_failure
 
   build-backend:
     docker:
@@ -96,7 +106,7 @@ jobs:
       - save_cache:
           paths: [backend/node_modules]
           key: backend-build
-      - notify_failure
+      - notify_on_failure
 
   test-frontend:
     docker:
@@ -111,7 +121,7 @@ jobs:
             cd backend
             npm install
             npm run test
-      - notify_failure
+      - notify_on_failure
 
   test-backend:
     docker:
@@ -126,7 +136,7 @@ jobs:
             cd backend
             npm install
             npm run test
-      - notify_failure
+      - notify_on_failure
 
   scan-frontend:
     docker:
@@ -141,7 +151,7 @@ jobs:
             cd frontend
             npm install
             npm audit fix --audit-level=critical --force
-      - notify_failure
+      - notify_on_failure
 
   scan-backend:
     docker:
@@ -158,7 +168,7 @@ jobs:
             npm audit fix --audit-level=critical --force
             npm audit fix --force
             npm audit --audit-level=critical
-      - notify_failure
+      - notify_on_failure
 
   deploy-infrastructure:
     docker:
@@ -202,43 +212,26 @@ jobs:
   configure-infrastructure:
     docker:
       - image: python:3.7-alpine3.11
-        environment:
-          NODE_ENV: "local"
-          VERSION: "1"
-          ENVIRONMENT: "production"
-          TYPEORM_CONNECTION: $TYPEORM_CONNECTION
-          TYPEORM_HOST: $TYPEORM_HOST
-          TYPEORM_USERNAME: $TYPEORM_USERNAME
-          TYPEORM_PASSWORD: $TYPEORM_PASSWORD
-          TYPEORM_DATABASE: $TYPEORM_DATABASE
-          TYPEORM_PORT: $TYPEORM_PORT
-          TYPEORM_ENTITIES: $TYPEORM_ENTITIES
     steps:
       - checkout
       - install_ansible
       - add_ssh_keys:
-          fingerprints:
-            - 'f1:f5:07:72:ec:51:74:5f:9e:62:00:2c:48:62:67:70'
+          fingerprints: ["5d:2a:86:58:70:a0:c1:96:82:54:f5:9c:28:a7:da:06"]
       - attach_workspace:
           at: ~/
       - run:
           name: Install dependencies
           command: |
-            apk add curl
-            apk add --upgrade bash
-            apk add --update ansible
-            apk add openssh-client
-            pip3 install awscli
+            apk add --update tar gzip ansible nodejs npm curl && \
+            pip install awscli
       - run:
-          name: Configure server
+          name: Configure Server
           command: |
-            cat ~/project/.circleci/ansible/inventory.txt
-            export ANSIBLE_HOST_KEY_CHECKING=False
-            ansible-playbook -i ~/project/.circleci/ansible/inventory.txt ~/project/.circleci/ansible/configure-server.yml
-      # Here's where you will add some code to rollback on failure
-      - destroy-environment:
-          Workflow_ID: ${CIRCLE_WORKFLOW_ID:0:7}
-      - notify_failure
+            cd .circleci/ansible
+            cat inventory.txt
+            ansible-playbook -i inventory.txt configure-server.yml
+      - destroy-environment
+      - notify_on_failure
 
 #   run-migrations:
 #     docker:
