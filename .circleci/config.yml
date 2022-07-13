@@ -8,16 +8,6 @@ commands:
           channel: udacitydev
           event: fail
           template: basic_fail_1
-  install_ansible:
-    description: install Ansible
-    steps:
-      - run:
-          name: Install Ansible
-          command: |
-            sudo apt update
-            sudo apt install software-properties-common
-            sudo add-apt-repository --yes --update ppa:ansible/ansible
-            sudo apt install ansible
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks.
     parameters:
@@ -179,10 +169,9 @@ jobs:
           workflow_id: '${CIRCLE_WORKFLOW_ID:0:7}'
   configure-infrastructure:
     docker:
-      - image: 'python:3.7-alpine3.11'
+      - image: 'cimg/base:stable'
     steps:
       - checkout
-      - install_ansible
       - add_ssh_keys:
           fingerprints:
             - 'f1:f5:07:72:ec:51:74:5f:9e:62:00:2c:48:62:67:70'
