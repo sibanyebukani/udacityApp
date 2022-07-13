@@ -195,50 +195,49 @@ jobs:
       - destroy-environment:
           workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
-  # configure-infrastructure:
-  #   docker:
-  #     - image: python:3.7-alpine3.11
-  #   steps:
-  #     - checkout
-  #     - install_ansible
-  #     - add_ssh_keys:
-  #         fingerprints: ['f1:f5:07:72:ec:51:74:5f:9e:62:00:2c:48:62:67:70']
-  #     - attach_workspace:
-  #         at: ~/
-  #     - run:
-  #         name: Install dependencies
-  #         command: |
-  #           apk add curl
-  #           apk add --upgrade bash
-  #           apk add --update ansible
-  #           apk add openssh-client
-  #           pip3 install awscli
-  #     - run:
-  #         name: Configure server
-  #         command: |
-  #           cat .circleci/ansible/inventory.txt
-  #           export ANSIBLE_HOST_KEY_CHECKING=False
-  #           ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
-  #     # Here's where you will add some code to rollback on failure
-  #     - destroy-environment:
-  #         workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
+  configure-infrastructure:
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - install_ansible
+      - add_ssh_keys:
+          fingerprints: ['f1:f5:07:72:ec:51:74:5f:9e:62:00:2c:48:62:67:70']
+      - attach_workspace:
+          at: ~/
+      - run:
+          name: Install dependencies
+          command: |
+            apk add --upgrade bash
+            apk add --update ansible
+            apk add openssh-client
+            pip3 install awscli
+      - run:
+          name: Configure server
+          command: |
+            cat .circleci/ansible/inventory.txt
+            export ANSIBLE_HOST_KEY_CHECKING=False
+            ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/configure-server.yml
+      # Here's where you will add some code to rollback on failure
+      - destroy-environment:
+          workflow_id: ${CIRCLE_WORKFLOW_ID:0:7}
 
-  #   run-migrations:
-  #     docker:
-  #       # Docker image here that supports NodeJS
-  #     steps:
-  #       # Checkout code from git
-  #       - run:
-  #           name: Run migrations
-  #           command: |
-  #             # Your code here
-  #             exit 1
-  #       - run:
-  #           name: Send migration results to memstash
-  #           command: |
-  #             # Your code here
-  #             exit 1
-  #      # Here's where you will add some code to rollback on failure
+    run-migrations:
+      docker:
+        # Docker image here that supports NodeJS
+      steps:
+        # Checkout code from git
+        - run:
+            name: Run migrations
+            command: |
+              # Your code here
+              exit 1
+        - run:
+            name: Send migration results to memstash
+            command: |
+              # Your code here
+              exit 1
+       # Here's where you will add some code to rollback on failure
 
   #   deploy-frontend:
   #     docker:
