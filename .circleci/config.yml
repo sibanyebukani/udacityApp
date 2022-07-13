@@ -9,15 +9,6 @@ commands:
             channel: udacitydev
             event: fail
             template: basic_fail_1
-    install_awscli:
-      description: install AWS cli v2
-      steps:
-        - run:
-            name: Install AWS cli v2
-            command: |
-              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-              unzip awscliv2.zip
-              sudo ./aws/install
     install_ansible:
       description: install Ansible
       steps:
@@ -165,7 +156,10 @@ jobs:
       - image: amazon/aws-cli
     steps:
       - checkout
-      - install_awscli
+      - run:
+          name: Install tar utility
+          command: |
+            yum install -y tar gzip
       - run:
           name: Ensure back-end infrastructure exists
           command: |
