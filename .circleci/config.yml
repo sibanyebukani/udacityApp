@@ -2,6 +2,12 @@ version: 2.1
 orbs:
   slack: circleci/slack@4.10.1
 commands:
+  notify_failure:
+    steps:
+      - slack/notify:
+          channel: udacitydev
+          event: fail
+          template: basic_fail_1
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks.
     parameters:
@@ -306,14 +312,14 @@ jobs:
 #             then
 #               # your code here
 #             fi
-  notify_success:
-    docker:
-      - image: 'cimg/base:stable'
-    steps:
-      - slack/notify:
-          channel: udacitydev
-          event: pass
-          template: success_tagged_deployment_1
+  # notify_success:
+  #   docker:
+  #     - image: 'cimg/base:stable'
+  #   steps:
+  #     - slack/notify:
+  #         channel: udacitydev
+  #         event: pass
+  #         template: success_tagged_deployment_1
 
 workflows:
   default:
@@ -332,7 +338,7 @@ workflows:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
           filters:
             branches:
-              only: [test-feature-branch]
+              only: [master]
       # - configure-infrastructure:
       #     requires: [deploy-infrastructure]
       # - run-migrations:
