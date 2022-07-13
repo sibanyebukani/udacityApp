@@ -26,16 +26,7 @@ commands:
             sudo apt update
             sudo apt install software-properties-common
             sudo add-apt-repository --yes --update ppa:ansible/ansible
-            sudo apt install ansible -y
-
-  install_nodejs:
-    description: Install Node.js 13
-    steps:
-      - run:
-          name: Install Node.js 13
-          command: |
-            curl -fsSL https://deb.nodesource.com/setup_13.x | sudo -E bash -
-            sudo apt install -y nodejs
+            sudo apt install ansible
 
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
@@ -205,8 +196,7 @@ jobs:
           root: ~/
           paths:
             - project/.circleci/ansible/inventory.txt
-      - destroy-environment:
-          Workflow_ID: ${CIRCLE_WORKFLOW_ID:0:7}
+      - destroy-environment
       - notify_on_failure
 
   configure-infrastructure:
@@ -219,11 +209,6 @@ jobs:
           fingerprints: ["5d:2a:86:58:70:a0:c1:96:82:54:f5:9c:28:a7:da:06"]
       - attach_workspace:
           at: ~/
-      - run:
-          name: Install dependencies
-          command: |
-            apk add --update tar gzip ansible nodejs npm curl && \
-            pip install awscli
       - run:
           name: Configure Server
           command: |
