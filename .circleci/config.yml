@@ -8,10 +8,10 @@ commands:
           channel: udacitydev
           event: fail
           template: basic_fail_1
-    destroy-environment:
+  destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks.
     parameters:
-     workflow_id:
+      workflow_id:
         type: string
     steps:
       - run:
