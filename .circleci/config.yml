@@ -415,20 +415,30 @@ jobs:
       - checkout
       - install_awscli
       - install_nodejs
+      - attach_workspace:
+          at: ~/
       - run:
-          name: Remove old stacks and files
+          name: Fetch and Remove old stacks and files
           command: |
-            export STACKS_NAME=($(aws cloudformation list-stacks \
-                --query "StackSummaries[*].StackName" \
-                --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
-            echo Stack names: "${STACKS_NAME[@]}"
+            # Fetch the Old workflow ID
             export OldWorkflowID=$(curl --insecure https://kvdb.io/${KVDB_BUCKET}/old_workflow_id)
             echo Old Workflow ID: $OldWorkflowID
-            if [[ "${STACKS_NAME[@]}" =~ "${OldWorkflowID}" ]]
+            echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
+            # Fetch the stack names
+            export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
+                    --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
+            echo Stack names: "${STACKS[@]}"
+
+
+
+            if [[ "${CIRCLE_WORKFLOW_ID:0:7}" =~ "${OldWorkflowID}" ]]
             then
+            echo "Stacks Deleted"
               aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
               aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
               aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
+            else
+              echo cannot Delete Stacks
             fi
 
 workflows:
