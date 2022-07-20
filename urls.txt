@@ -1,6 +1,15 @@
+<<<<<<< HEAD
 [URL01]
 https://github.com/Flex13/udacityApp
 
 [URL02]
 http://udapeople-6465f8d.s3-website-us-east-1.amazonaws.com/
 
+=======
+[URL01]
+https://github.com/Flex13/udacityApp
+
+[URL02]
+http://udapeople-6465f8d.s3-website-us-east-1.amazonaws.com/
+
+>>>>>>> e3c5c8cfb18801cccbdd24f2dd587ca48470f190
