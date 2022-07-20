@@ -1,37 +1,50 @@
 ---
-
-- name: "update apt"
+- name: Update apt packages.
   become: yes
   apt:
     update_cache: yes
-
-- name: "upgrade apt packages"
-  become: true
+- name: Upgrade packages
+  become: yes
   apt:
     upgrade: "yes"
-
-- name: "install dependencies."
-  become: true
+- name: Remove dependencies that are no longer required.
+  become: yes
   apt:
-    name: ["nodejs", "npm"]
+    autoremove: "yes"
+- name: Remove dependencies that are no longer required.
+  become: yes
+  apt:
+    autoremove: "yes"
+- name: Install dependencies
+  become: yes
+  apt:
+    name: ["nodejs", "npm", "python3", "tar", "gzip", "git"]
     state: latest
     update_cache: yes
-
-- name: "install n"
+- name: install pm2
   become: yes
-  npm:
-    name: n
-    global: yes
-    production: yes
-
-- name: "install nodejs 13.8.0"
-  become: yes
-  shell: n 13.8.0
-
-- name: "install pm2"
-  become: true
   npm:
     name: pm2
     global: yes
     production: yes
     state: present
+- name: Create dist directory.
+  file:
+    path: "~/home/ubuntu/backend"
+    state: directory
+# - name: Move backend files to EC2 backend server.
+#   copy:
+#     src: /root/project/backend
+#     dest: ~/home/ubuntu
+# - name: Install package dependencies
+#   shell: |
+#     cd ~/home/ubuntu/backend
+#     npm i
+# - name: Building dist.
+#   shell: |
+#     cd ~/home/ubuntu/backend
+#     npm run build
+# - name: Run migrations.
+#   shell: |
+#     cd ~/home/ubuntu/backend
+#     npm run migrations
