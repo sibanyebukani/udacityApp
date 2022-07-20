@@ -3,6 +3,9 @@
 - name: "configuration play."
   hosts: web
   user: ubuntu
+  become: true
+  become_method: sudo
+  become_user: root
   gather_facts: false
   vars:
     ansible_python_interpreter: /usr/bin/python3
@@ -30,11 +33,14 @@
 
     - name: "install python for Ansible."
       # Your code here
-      become: yes
+      become: true
       apt:
         name: "python3-pip"
         update_cache: yes
         state: present
+        changed_when: false
+
+    - setup:
 
   roles:
     - configure-prometheus-node-exporter
