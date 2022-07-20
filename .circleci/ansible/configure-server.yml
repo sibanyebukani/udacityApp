@@ -33,12 +33,11 @@
 
     - name: "install python for Ansible."
       # Your code here
-      become: true
+      become: yes
       apt:
         name: "python3-pip"
         update_cache: yes
         state: present
-        changed_when: false
 
     - setup:
 
