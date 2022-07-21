@@ -425,6 +425,7 @@ jobs:
             cat OldWorkflowID.txt
             OldWorkflowID=$(cat OldWorkflowID.txt)
             echo $OldWorkflowID
+            echo NEW iD: ${CIRCLE_WORKFLOW_ID:0:7}
             echo "s3://udapeople-${OldWorkflowID}"
             if [[ ${CIRCLE_WORKFLOW_ID:0:7} != ${OldWorkflowID} ]]
             then
