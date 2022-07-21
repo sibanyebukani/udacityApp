@@ -427,8 +427,12 @@ jobs:
           command: |
             # Fetch the Old workflow ID
             export OldWorkflowID=$(curl --insecure https://kvdb.io/${KVDB_BUCKET}/old_workflow_id)
+
+
             echo Old Workflow ID: $OldWorkflowID
             echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
+
+
             # Fetch the stack names
             export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
                     --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
@@ -442,8 +446,6 @@ jobs:
               aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
               aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
               aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
-            else
-              echo cannot Delete Stacks
             fi
 
 workflows:
