@@ -345,6 +345,9 @@ jobs:
       - image: python:3.9.1-alpine3.12
     steps:
       - checkout
+      - install_awscli
+      - install_ansible
+      - install_nodejs
       - add_ssh_keys:
           fingerprints: ["5d:2a:86:58:70:a0:c1:96:82:54:f5:9c:28:a7:da:06"]
       - attach_workspace:
@@ -354,15 +357,16 @@ jobs:
       - run:
           name: Install dependencies
           command: |
-            # your code here
-            apk update
-            apk add --upgrade curl
-            apk add --upgrade tar
-            apk add --upgrade gzip
-            apk add --update ansible
-            apk add --update nodejs
-            apk add --update npm
-            pip3 install awscli
+            cd backend
+            npm install
+      - run:
+          name: Package Backend
+          command: |
+            cd backend
+            npm run build
+            tar -czf artifact.tar.gz dist/* package*
+            cd ..
+            cp backend/artifact.tar.gz .circleci/ansible/roles/deploy/files
       - run:
           name: Deploy backend
           command: |
