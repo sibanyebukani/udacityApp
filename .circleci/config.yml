@@ -77,7 +77,7 @@ jobs:
       - run:
           name: front-end Unit Test
           command: |
-            cd backend
+            cd frontend
             npm install
             npm run test
       - save_cache:
