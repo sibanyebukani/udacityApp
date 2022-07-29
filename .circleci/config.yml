@@ -394,7 +394,7 @@ jobs:
             FRONTEND_WEBSITE=http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website.${AWS_DEFAULT_REGION}.amazonaws.com
             if curl -s $FRONTEND_WEBSITE | grep "Welcome"
             then
-              exit 1
+              exit 0
             else
               exit 1
             fi
@@ -415,20 +415,41 @@ jobs:
       - revert-migrations
       - notify_on_failure
 
-  # cloudfront-update:
-    # docker:
-      # # Docker image here that supports AWS CLI
-    # steps:
-      # # Checkout code from git
-      # - run:
-          # name: Install dependencies
-          # command: |
-            # # your code here
-      # - run:
-          # name: Update cloudfront distribution
-          # command: |
-            # # your code here
-      # # Here's where you will add some code to rollback on failure  
+  cloudfront-update:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            # your code here
+            yum -y install tar gzip
+      - run:
+          name: Update cloudfront distribution
+          command: |
+            # your code here
+            OldWorkflowID=$(aws cloudformation \
+            list-exports --query "Exports[?Name==\`WorkflowID\`].Value" \
+            --no-paginate --output text)
+            touch OldWorkflowID.txt
+            echo $OldWorkflowID >> ~/OldWorkflowID.txt
+            cat ~/OldWorkflowID.txt
+            aws cloudformation deploy \
+              --template-file .circleci/files/cloudfront.yml \
+              --stack-name InitialStack \
+              --parameter-overrides WorkflowID="${CIRCLE_WORKFLOW_ID:0:7}" \
+              --tags project=udapeople
+
+            echo "OldWorkflowID: ${OldWorkflowID}"
+            echo "Current Workflow Id: ${CIRCLE_WORKFLOW_ID:0:7}"
+      - persist_to_workspace:
+          root: ~/
+          paths:
+            - OldWorkflowID.txt
+      - destroy-environment
+      - revert-migrations
+      - notify_on_failure 
 
 # cleanup:
     # docker:
@@ -478,7 +499,7 @@ workflows:
           requires: [run-migrations]
       - smoke-test:
           requires: [deploy-backend, deploy-frontend]
-      # - cloudfront-update:
-      #     requires: [smoke-test]
+      - cloudfront-update:
+          requires: [smoke-test]
       # - cleanup:
       #     requires: [cloudfront-update]
