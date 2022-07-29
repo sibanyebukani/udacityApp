@@ -442,24 +442,43 @@ jobs:
       - revert-migrations
       - notify_on_failure 
 
-# cleanup:
-    # docker:
-      # # Docker image here
-    # steps:
-      # # Checkout code from git
-      # - run:
-          # name: Get old stack workflow id
-          # command: |
-            # # your code here
-            # export OldWorkflowID="the id here"
-            # export STACKS=[] #put the list of stacks here
-      # - run:
-          # name: Remove old stacks and files
-          # command: |
-            # if [[ "${STACKS[@]}" =~ "${OldWorkflowID}" ]]
-            # then
-              # # your code here
-            # fi
+  cleanup:
+    docker:
+      - image: amazon/aws-cli
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            yum -y install tar gzip
+      - attach_workspace:
+            at: ~/
+      - run:
+          name: Get old stack workflow id
+          command: |
+            # your code here
+            export OldWorkflowID=$(cat ~/OldWorkflowID.txt)
+            echo "${OldWorkflowID}"
+            echo OldWorkflowID: "${OldWorkflowID}"
+            echo CIRCLE_WORKFLOW_ID "${CIRCLE_WORKFLOW_ID:0:7}"
+            # Fetch the stack names
+            export STACKS=($(aws cloudformation list-stacks --query "StackSummaries[*].StackName" \
+                    --stack-status-filter CREATE_COMPLETE --no-paginate --output text))
+            echo Stack names: "${STACKS[@]}"
+            if [[ "${CIRCLE_WORKFLOW_ID:0:7}" != "${OldWorkflowID}" ]]
+            then
+              # your code here
+              echo "--------------------Delete Confirmed-----------------------------"
+                aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
+                aws s3 rb "s3://udapeople-${OldWorkflowID}"
+                aws cloudformation delete-stack --stack-name "backend-${OldWorkflowID}"
+                aws cloudformation delete-stack --stack-name "frontend-${OldWorkflowID}"
+              else
+                echo "------------------------Cannot Cleanup---------------------------"
+            fi
+      - destroy-environment
+      - revert-migrations
+      - notify_on_failure
             
 
 workflows:
@@ -492,5 +511,5 @@ workflows:
           requires: [deploy-backend, deploy-frontend]
       - cloudfront-update:
           requires: [smoke-test]
-      # - cleanup:
-      #     requires: [cloudfront-update]
+      - cleanup:
+          requires: [cloudfront-update]
