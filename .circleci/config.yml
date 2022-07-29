@@ -188,32 +188,22 @@ jobs:
 
   configure-infrastructure:
     docker:
-      - image: python:3.9.1-alpine3.12
+      - image: cimg/base:stable
     steps:
       - checkout
+      - install_ansible
       - add_ssh_keys:
-          fingerprints: ['5d:2a:86:58:70:a0:c1:96:82:54:f5:9c:28:a7:da:06']
+          fingerprints: ['f1:f5:07:72:ec:51:74:5f:9e:62:00:2c:48:62:67:70']
       - attach_workspace:
           at: ~/
       - run:
-          name: Install dependencies
-          command: |
-            apk update
-            apk add --upgrade tar
-            apk add --upgrade gzip
-            apk add --upgrade curl
-            apk add --upgrade bash
-            apk add --update ansible
-            apk add openssh-client
-            pip3 install awscli
-      - run:
-          name: Configure server
+          name: Configure Server
           command: |
             cd .circleci/ansible
-            pwd
+            cat inventory.txt
             ansible-playbook -i inventory.txt configure-server.yml
-      # - destroy-environment
-      - notify_on_failure      
+      - destroy-environment
+      - notify_on_failure     
 
   # run-migrations:
     # docker:
