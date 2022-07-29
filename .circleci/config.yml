@@ -10,6 +10,16 @@ commands:
           channel: udacitydev
           event: fail
           template: basic_fail_1
+  install_ansible:
+    description: install Ansible
+    steps:
+      - run:
+          name: install Ansible
+          command: |
+            sudo apt update
+            sudo apt install software-properties-common
+            sudo add-apt-repository --yes --update ppa:ansible/ansible
+            sudo apt install ansible -y
   destroy-environment:
     description: Destroy back-end and front-end cloudformation stacks given a workflow ID.
     parameters:
