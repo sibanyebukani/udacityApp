@@ -11,7 +11,7 @@ import * as express from 'express';
 import { ErrorFilter } from './modules/errors/error.filter';
 
 
-console.log("Hello From Sibanye");
+console.log("Hello From Sibany Deve");
 
 async function bootstrap() {
   const logger = new AppLogger();
