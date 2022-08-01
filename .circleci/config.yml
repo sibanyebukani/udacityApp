@@ -448,7 +448,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install dependencies
+          name: Install dependenciess
           command: |
             yum -y install tar gzip
       - attach_workspace:
