@@ -454,7 +454,7 @@ jobs:
       - attach_workspace:
             at: ~/
       - run:
-          name: Get old stack workflow id
+          name: Get old stack workflow ID
           command: |
             # your code here
             export OldWorkflowID=$(cat ~/OldWorkflowID.txt)
