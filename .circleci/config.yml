@@ -448,7 +448,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Install dependenciess
+          name: Install dependencies
           command: |
             yum -y install tar gzip
       - attach_workspace:
@@ -498,7 +498,7 @@ workflows:
           requires: [test-frontend, test-backend, scan-frontend, scan-backend]
           filters:
             branches:
-              only: [master]
+              only: [development-branch]
       - configure-infrastructure:
           requires: [deploy-infrastructure]
       - run-migrations:
