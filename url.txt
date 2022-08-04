@@ -1,0 +1,7 @@
+Public git URL:
+
+https://github.com/Flex13/udacityApp
+
+S3 url:
+
+http://udapeople-63698bc.s3-website-us-east-1.amazonaws.com
